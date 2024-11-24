@@ -5,7 +5,7 @@ class Admin extends User {
     public Admin(String username) {
 
         super(username);
-        orders = new ArrayList<>();
+        orders = Main.orders;
     }
     @Override
     public void displayMenu(List<MenuItem> menu) {
@@ -26,7 +26,7 @@ class Admin extends User {
                     manageMenu(menu);
                     break;
                 case 2:
-                    processOrders();
+                    processOrders(Main.orders);
                     break;
                 case 3:
                     orderManagement();
@@ -35,9 +35,7 @@ class Admin extends User {
                     generateReport();
                     break;
                 case 5:
-
                     return;
-
                 default:
                     System.out.println("Invalid choice.");
             }
@@ -109,29 +107,36 @@ class Admin extends User {
         menu.removeIf(item -> item.getName().equalsIgnoreCase(nameToRemove));
         System.out.println("Removed item: " + nameToRemove);
     }
-    private void processOrders() {
+
+    public void processOrders(List<Order> orders) {
         Scanner scanner = new Scanner(System.in);
-        if (orders.isEmpty()) {
+        List<Order> pendingOrders = new ArrayList<>();
+        for (Order order : orders) {
+            if (order.getStatus().equalsIgnoreCase("Received")) {
+                pendingOrders.add(order);
+            }
+        }
+
+        if (pendingOrders.isEmpty()) {
             System.out.println("No pending orders.");
             return;
         }
 
         System.out.println("\nPending Orders:");
-        for (Order order : orders) {
-            if (order.getStatus().equalsIgnoreCase("Received")) {
-                System.out.println(order.toString());
-            }
+        for (Order order : pendingOrders) {
+            System.out.println(order.toString());
         }
 
         System.out.print("Enter Order ID to process: ");
         int orderId = getValidInteger(scanner);
 
-        for (Order order : orders) {
+        for (Order order : pendingOrders) {
             if (order.getOrderId() == orderId) {
                 System.out.println("Current Status: " + order.getStatus());
                 System.out.println("1. Mark as Preparing");
                 System.out.println("2. Mark as Completed");
                 System.out.println("3. Deny Order");
+                System.out.println("4. Back");
                 int choice = getValidInteger(scanner);
 
                 switch (choice) {
@@ -147,39 +152,43 @@ class Admin extends User {
                         order.setStatus("Denied");
                         System.out.println("Order denied.");
                         break;
+                    case 4:
+                        return;
                     default:
-                        System.out.println("Invalid choice.");
+                        System.out.println("Invalid");
                 }
                 return;
             }
         }
+
         System.out.println("Order ID not found.");
     }
 
     private void orderManagement() {
         Scanner scanner = new Scanner(System.in);
 
-        if (orders.isEmpty()) {
+        if (Main.orders.isEmpty()) {
             System.out.println("No orders to manage.");
             return;
         }
 
         System.out.println("\nPending Orders:");
-        for (Order order : orders) {
+        for (Order order : Main.orders) {
             if (order.getStatus().equalsIgnoreCase("Received")) {
-                System.out.println(order.toString());
+                System.out.println(order);
             }
         }
 
         System.out.print("Enter Order ID to update or refund: ");
         int orderId = getValidInteger(scanner);
 
-        for (Order order : orders) {
+        for (Order order : Main.orders) {
             if (order.getOrderId() == orderId) {
                 System.out.println("Current Status: " + order.getStatus());
                 System.out.println("1. Update Order Status");
                 System.out.println("2. Process Refund");
                 System.out.println("3. Handle Special Requests");
+                System.out.println("4. Back");
                 int choice = getValidInteger(scanner);
 
                 switch (choice) {
@@ -192,6 +201,8 @@ class Admin extends User {
                     case 3:
                         handleSpecialRequests(order);
                         break;
+                    case 4:
+                        return;
                     default:
                         System.out.println("Invalid choice.");
                 }
@@ -206,6 +217,7 @@ class Admin extends User {
         System.out.println("1. Mark as Preparing");
         System.out.println("2. Mark as Completed");
         System.out.println("3. Deny Order");
+        System.out.println("4. Back");
 
         int choice = getValidInteger(scanner);
 
@@ -219,17 +231,17 @@ class Admin extends User {
             case 3:
                 order.setStatus("Denied");
                 break;
+            case 4:
+                return;
             default:
                 System.out.println("Invalid choice.");
-                return;//invalid
+                return;
         }
 
         System.out.println("Order status updated to: " + order.getStatus());
     }
 
     private void processRefund(Order order) {
-        Scanner scanner = new Scanner(System.in);
-
         if (!order.getStatus().equalsIgnoreCase("Denied")) {
             order.setStatus("Refunded");
             System.out.println("Processed refund for Order ID: " + order.getOrderId());
@@ -258,7 +270,6 @@ class Admin extends User {
     }
 
     private void generateReport() {
-        Scanner scanner = new Scanner(System.in);
 
         double totalSales = 0;
         Map<String, Integer> itemPopularity = new HashMap<>();

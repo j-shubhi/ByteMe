@@ -5,13 +5,15 @@ import java.util.Scanner;
 public class Main {
 
     static List<MenuItem> menu = new ArrayList<>();
-    private static List<Order> orders = new ArrayList<>();
+    static List<Order> orders = new ArrayList<>();
 
     static {
         menu.add(new MenuItem("Burger", 50, "Snacks", true));
         menu.add(new MenuItem("Pizza", 800, "Meals", true));
         menu.add(new MenuItem("Soda", 20, "Beverages", true));
         menu.add(new MenuItem("Fries", 110, "Snacks", true));
+        menu.add(new MenuItem("Brownie", 85, "Sweet", true));
+        menu.add(new MenuItem("Dosa", 70, "Lunch", false));
     }
 
     public static void main(String[] args) {
@@ -23,8 +25,8 @@ public class Main {
 
         while (true) {
             System.out.println("\nWelcome to Byte Me!");
-            System.out.println("1. Admin Login");
-            System.out.println("2. Customer Login");
+            System.out.println("1. Admin");
+            System.out.println("2. Customer");
             System.out.println("3. Exit");
             int choice = getValidInteger(scanner);
             switch (choice) {
@@ -33,12 +35,7 @@ public class Main {
                     break;
 
                 case 2:
-                    boolean exitCustomerLoop = false;
-                    while (!exitCustomerLoop) {
-
-                        customer1.displayMenu(menu);
-                        exitCustomerLoop=true;
-                    }
+                    customer1.displayMenu(menu);
                     break;
 
                 case 3:
