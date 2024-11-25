@@ -1,6 +1,8 @@
+import java.io.Serializable;
 import java.util.List;
 
-class Order {
+public class Order implements Serializable {
+    private static final long serialVersionUID = 1L;
     private static int orderCounter = 0;
     private int orderId;
     private List<MenuItem> items;
