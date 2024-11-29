@@ -1,3 +1,7 @@
+*How to Run*
+
+Open Directory in IntelliJ(my preference) then navigate to Main Class, run it, go with flow, done and dusted.
+
 *Collections*
 
 ArrayList for Menu Items:
