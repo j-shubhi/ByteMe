@@ -1,16 +1,55 @@
 import java.util.*;
 
 class Customer extends User {
-
+    private static final double VIP_MEMBERSHIP_FEE = 50.00;
     private Cart cart;
     private List<Order> orderHistory;
     private boolean isVIP;
+    private double totalSpentOnVIP;
 
     public Customer(String username) {
         super(username);
         cart = new Cart();
         orderHistory = new ArrayList<>();
         this.isVIP = false;
+        this.totalSpentOnVIP = 0.0;
+    }
+    public boolean becomeVIP() {
+        if (isVIP) {
+            System.out.println("You are already a VIP member.");
+            return false;
+        }
+
+        double currentBalance = calculateTotalSpending();
+        if (currentBalance >= VIP_MEMBERSHIP_FEE) {
+            isVIP = true;
+            totalSpentOnVIP += VIP_MEMBERSHIP_FEE;
+            System.out.println("Congratulations! You are now a VIP member.");
+            System.out.println("VIP Membership Fee: Rs." + VIP_MEMBERSHIP_FEE);
+            return true;
+        } else {
+            System.out.println("Insufficient spending to become VIP.");
+            System.out.printf("You need to spend at least Rs.%.2f total. Current total: Rs.%.2f%n",
+                    VIP_MEMBERSHIP_FEE, currentBalance);
+            return false;
+        }
+    }
+
+    public void cancelVIPMembership() {
+        if (isVIP) {
+            isVIP = false;
+            System.out.println("VIP membership canceled.");
+        } else {
+            System.out.println("You are not a VIP member.");
+        }
+    }
+
+    private double calculateTotalSpending() {
+        return orderHistory.stream()
+                .mapToDouble(order -> order.getItems().stream()
+                        .mapToDouble(MenuItem::getPrice)
+                        .sum())
+                .sum();
     }
 
     public void setVIP(boolean isVIP) {
@@ -26,7 +65,8 @@ class Customer extends User {
             System.out.println("2. Track Delivery");
             System.out.println("3. Cart Operations");
             System.out.println("4. Reviews");
-            System.out.println("5. Exit");
+            System.out.println("5. VIP Membership");
+            System.out.println("6. Exit");
 
             int choice = getValidInteger(scanner);
 
@@ -44,6 +84,9 @@ class Customer extends User {
                     manageReviews(menu);
                     break;
                 case 5:
+                    manageVIPStatus();
+                    break;
+                case 6:
                     return;
                 default:
                     System.out.println("Invalid choice.");
@@ -226,7 +269,6 @@ class Customer extends User {
                     boolean flag = true;
                     for (MenuItem item : Main.menu) {
                         if (item.getName().equalsIgnoreCase(itemNameToAdd)) {
-// Assuming a default quantity of 1
                             addToCart(item, 1);
                             flag = false;
                             System.out.print("Item added");
@@ -297,7 +339,13 @@ class Customer extends User {
             System.out.println("Cart is empty!");
             return;
         }
-
+        double extraCharge = 0;
+        if (isVIP) {
+            //20% extra charge
+            extraCharge = total * 0.20;
+            total += extraCharge;
+            System.out.println("VIP Extra Charge Applied: Rs." + String.format("%.2f", extraCharge));
+        }
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter any special requests: ");
         String specialRequest = scanner.nextLine().trim();
@@ -311,12 +359,48 @@ class Customer extends User {
             }
         }
         Order order = new Order(itemsOrdered, specialRequest);
-        Main.orders.add(order);         // Add to main orders list
-        orderHistory.add(order);        // Add to customer's history
+        order.setExtraCharge(extraCharge);
+
+        Main.orders.add(order);
+        orderHistory.add(order);
+
         System.out.println("Order placed with ID: " + order.getOrderId());
+        System.out.println("Subtotal: Rs." + String.format("%.2f", total - extraCharge));
+        System.out.println("VIP Extra Charge: Rs." + String.format("%.2f", extraCharge));
+        System.out.println("Total Amount: Rs." + String.format("%.2f", total));
+
         cart = new Cart();
     }
+    public void manageVIPStatus() {
+        Scanner scanner = new Scanner(System.in);
 
+        while (true) {
+            System.out.println("\nVIP Membership Management:");
+            System.out.println("1. Check VIP Status");
+            System.out.println("2. Become VIP");
+            System.out.println("3. Cancel VIP Membership");
+            System.out.println("4. Exit");
+
+            int choice = getValidInteger(scanner);
+
+            switch (choice) {
+                case 1:
+                    System.out.println("Current VIP Status: " + (isVIP ? "VIP" : "Regular"));
+                    System.out.println("Total Spending: Rs." + calculateTotalSpending());
+                    break;
+                case 2:
+                    becomeVIP();
+                    break;
+                case 3:
+                    cancelVIPMembership();
+                    break;
+                case 4:
+                    return;
+                default:
+                    System.out.println("Invalid choice.");
+            }
+        }
+    }
     public void manageReviews(List<MenuItem> menu) {
         Scanner scanner = new Scanner(System.in);
 
@@ -391,5 +475,7 @@ class Customer extends User {
         }
         System.out.println("Item not found.");
     }
-
+    public Cart getCart() {
+        return cart;
+    }
 }

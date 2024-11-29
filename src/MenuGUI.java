@@ -116,7 +116,6 @@ public class MenuGUI {
     }
 
     private void setupRefreshTimer() {
-        // Refresh data every 2 seconds
         refreshTimer = new Timer(2000, e -> {
             loadDataFromFiles();
             refreshMenuData();
