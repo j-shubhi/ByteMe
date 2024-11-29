@@ -16,6 +16,28 @@ List for Reviews:
 
 Each MenuItem has a List<String> to store reviews. This allows multiple reviews to be associated with each menu item dynamically.
 
+*Testing*
+
+The project includes comprehensive JUnit 5 tests covering:
+
+Handling out-of-stock items
+
+Adding items to cart
+
+Modifying cart item quantities
+
+Preventing negative quantities
+
+build tool: Maven
+
+ensure you have: Java Development Kit (JDK), JUnit 5 dependencies
+
+*Dependencies*
+
+Java 8+
+
+JUnit 5
+
 *OOPS*
 
 1. Classes and Objects
@@ -50,6 +72,8 @@ ArrayList: Used for storing menu items (List<MenuItem> menu) and orders (List<Or
 HashMap: Used in the Cart class to associate menu items with their quantities (Map<MenuItem, Integer cartItems). This provides efficient access for adding or modifying cart contents.
 
 *Assumptions*
+
 Sort by popularity
 Top 5 items
 Assuming a default quantity of 1
+VIPS: 20% extra charge
